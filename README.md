@@ -52,7 +52,7 @@ When you have made changes to a flow in the Studio editor, you can pull them dow
 
     $ twilio twilioapp:run pullFlows
 
-This will overwrite local files in the `flows` directory with flows you have edited in Twilio. Use `git diff` to see changes.
+This will overwrite local files in the `flows` directory with flows you have edited in Twilio. Assuming you have your local flows committed to git, you can use `git diff` to see changes.
 
 ## Push flows
 
