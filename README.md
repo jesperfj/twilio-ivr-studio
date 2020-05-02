@@ -1,6 +1,6 @@
 # Twilio Studio IVR quick deploy
 
-This repo demonstrates a quick deploy app that uses Twilio Studio to implement an IVR flow. It takes advantage of the new beta Studio REST API which allows Studio flows to be read and written as json objects via REST API. This allows you to manage changes to flows via a git repo like this.
+This repo demonstrates a quick deploy app that uses Twilio Studio to implement an IVR flow. It takes advantage of the [new beta Studio REST API](https://www.twilio.com/blog/automate-flow-deployments-studio-rest-api-v2-beta) which allows Studio flows to be read and written as json objects via REST API. This allows you to manage changes to flows via a git repo like this.
 
 ### Caveat
 
