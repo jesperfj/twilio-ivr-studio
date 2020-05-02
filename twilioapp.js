@@ -1,7 +1,7 @@
 const fs = require('fs')
 
 async function install(app,argv) {
-    const flows = await createFlows(app,argv)
+    const flows = await pushFlows(app,argv)
     console.log(flows)
     console.log(`Allocating US phone number in 323 area code ($1/month) with callback to flow ${flows.ivr.sid}`)
     const result = await app.twilioClient.incomingPhoneNumbers.create({
@@ -30,24 +30,6 @@ async function uninstall(app,argv) {
 
 // These functions can be called with `twilio twilioapp:run <function-name>`.
 
-async function createFlows(app,argv) {
-    const flowFiles = fs.readdirSync("./flows")
-    let flowResults = {}
-    for(const fn of flowFiles) {
-        const flowDefinition = JSON.parse(fs.readFileSync(`./flows/${fn}`));
-        const flowName = fn.split('.')[0]
-        console.log(`Creating flow ${app.prefix}-${flowName}`)
-        const res = await app.twilioClient.studio.v2.flows.create({
-            commitMessage: "twilioapp install",
-            friendlyName: `${app.prefix}-${flowName}`,
-            status: 'published',
-            definition: flowDefinition
-        })
-        flowResults[flowName] = res
-    }
-    return flowResults
-}
-
 async function deleteFlows(app,argv) {
     const flows = await app.twilioClient.studio.v2.flows.list()
     const flowFiles = fs.readdirSync("./flows")
@@ -57,6 +39,36 @@ async function deleteFlows(app,argv) {
         if(flow) {
             console.log(`Deleting flow ${flow.friendlyName} with sid ${flow.sid}`)
             await app.twilioClient.studio.v2.flows(flow.sid).remove()
+        }
+    }
+}
+
+async function pushFlows(app,argv) {
+    let flows = await app.twilioClient.studio.v2.flows.list()
+    const flowFiles = fs.readdirSync("./flows")
+    let flowResults = { updated: {}, created: {} }
+
+    for(const fn of flowFiles) {
+        const flowDefinition = JSON.parse(fs.readFileSync(`./flows/${fn}`));
+        const flowName = fn.split('.')[0]
+        const flow = flows.find(elem => { return elem.friendlyName === `${app.prefix}-${flowName}` })
+        if(flow) {
+            console.log(`Updating flow ${flowName}`)
+            const res = await app.twilioClient.studio.v2.flows(flow.sid).update({
+                commitMessage: "Update from twilioapp",
+                status: 'published',
+                definition: flowDefinition
+            })
+            flowResults.updated[flowName] = res
+        } else {
+            console.log(`Creating new flow ${flowName}`)
+            const res = await app.twilioClient.studio.v2.flows.create({
+                commitMessage: "Create from twilioapp",
+                friendlyName: `${app.prefix}-${flowName}`,
+                status: 'published',
+                definition: flowDefinition
+            })
+            flowResults.created[flowName] = res
         }
     }
 }
@@ -105,9 +117,9 @@ async function execCmd(cmd) {
 module.exports = {
     install,
     uninstall,
-    createFlows,
     deleteFlows,
     pullFlows,
+    pushFlows,
     editFlow,
     tester
 }

@@ -2,6 +2,10 @@
 
 This repo demonstrates a quick deploy app that uses Twilio Studio to implement an IVR flow. It takes advantage of the new beta Studio REST API which allows Studio flows to be read and written as json objects via REST API. This allows you to manage changes to flows via a git repo like this.
 
+### Caveat
+
+This is a very quick and dirty concept meant to spark ideas of what's possible with the new Studio APIs. Edge cases are not handled and nothing has been hardened.
+
 ## Pre-requisites
 
 [Sign up for a Twilio account](https://www.twilio.com/try-twilio) if you don't have one. Your computer must have [Node.js v10](https://nodejs.org/en/download/) or higher. Install Twilio CLI with
@@ -33,3 +37,26 @@ Uninstall the app with
     $ twilio twilioapp:uninstall
 
 This will delete the Studio flow, Serverless service and release the phone number.
+
+## Edit a flow
+
+It's easiest to edit a flow from the Studio editor console. Open the editor on the 'ivr' flow with:
+
+    $ twilio twilioapp:run editFlow ivr
+
+As you create more flows you can open them by name in a similar way.
+
+## Pull changes
+
+When you have made changes to a flow in the Studio editor, you can pull them down with
+
+    $ twilio twilioapp:run pullFlows
+
+This will overwrite local files in the `flows` directory with flows you have edited in Twilio. Use `git diff` to see changes.
+
+## Push flows
+
+If you make local changes to your flows, you can push them to Twilio with
+
+    $ twilio twilioapp:run pushFlows
+
