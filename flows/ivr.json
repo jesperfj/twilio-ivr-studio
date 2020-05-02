@@ -1,0 +1,183 @@
+{
+  "states": [
+    {
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall",
+          "next": "gather_input"
+        },
+        {
+          "event": "incomingRequest"
+        }
+      ],
+      "type": "trigger",
+      "name": "Trigger",
+      "properties": {
+        "offset": {
+          "y": 50,
+          "x": 250
+        }
+      }
+    },
+    {
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "split_key_press"
+        },
+        {
+          "event": "speech",
+          "next": "split_speech_result"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call",
+      "name": "gather_input",
+      "properties": {
+        "language": "en",
+        "say": "Hello, how can we direct your call? Press 1 for sales, or say sales. To reach support, press 2 or say support.",
+        "timeout": 5,
+        "offset": {
+          "y": 250,
+          "x": 290
+        },
+        "voice": "alice",
+        "loop": 1
+      }
+    },
+    {
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "conditions": [
+            {
+              "type": "equal_to",
+              "friendly_name": "1",
+              "arguments": [
+                "{{widgets.gather_input.Digits}}"
+              ],
+              "value": "1"
+            }
+          ],
+          "event": "match",
+          "next": "connect_call_to_sales"
+        },
+        {
+          "conditions": [
+            {
+              "type": "equal_to",
+              "friendly_name": "2",
+              "arguments": [
+                "{{widgets.gather_input.Digits}}"
+              ],
+              "value": "2"
+            }
+          ],
+          "event": "match",
+          "next": "connect_call_to_support"
+        }
+      ],
+      "type": "split-based-on",
+      "name": "split_key_press",
+      "properties": {
+        "input": "{{widgets.gather_input.Digits}}",
+        "offset": {
+          "y": 510,
+          "x": 100
+        }
+      }
+    },
+    {
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "conditions": [
+            {
+              "type": "matches_any_of",
+              "friendly_name": "sales",
+              "arguments": [
+                "{{widgets.gather_input.SpeechResult}}"
+              ],
+              "value": "sales"
+            }
+          ],
+          "event": "match",
+          "next": "connect_call_to_sales"
+        },
+        {
+          "conditions": [
+            {
+              "type": "matches_any_of",
+              "friendly_name": "support",
+              "arguments": [
+                "{{widgets.gather_input.SpeechResult}}"
+              ],
+              "value": "support"
+            }
+          ],
+          "event": "match",
+          "next": "connect_call_to_support"
+        }
+      ],
+      "type": "split-based-on",
+      "name": "split_speech_result",
+      "properties": {
+        "input": "{{widgets.gather_input.SpeechResult}}",
+        "offset": {
+          "y": 510,
+          "x": 510
+        }
+      }
+    },
+    {
+      "transitions": [
+        {
+          "event": "callCompleted"
+        }
+      ],
+      "type": "connect-call-to",
+      "name": "connect_call_to_sales",
+      "properties": {
+        "to": "15555551234",
+        "noun": "number",
+        "caller_id": "{{contact.channel.address}}",
+        "offset": {
+          "y": 750,
+          "x": 100
+        }
+      }
+    },
+    {
+      "transitions": [
+        {
+          "event": "callCompleted"
+        }
+      ],
+      "type": "connect-call-to",
+      "name": "connect_call_to_support",
+      "properties": {
+        "to": "15555555678",
+        "noun": "number",
+        "caller_id": "{{contact.channel.address}}",
+        "offset": {
+          "y": 750,
+          "x": 520
+        }
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  },
+  "description": "IVR"
+}
