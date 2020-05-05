@@ -30,6 +30,10 @@ This will do the following
 * Deploy the `flows/ivr.json` Studio flow to Twilio.
 * Allocate a dedicated phone number to this IVR, costing $1 / month
 
+## Test
+
+Test the flow by calling the number that was printed after install completed.
+
 ## Uninstall
 
 Uninstall the app with
